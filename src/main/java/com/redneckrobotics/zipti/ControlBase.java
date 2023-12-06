@@ -2,6 +2,9 @@ package com.redneckrobotics.zipti;
 
 import java.util.HashMap;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+
+import edu.wpi.first.wpilibj.Joystick;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class ControlBase {
@@ -77,12 +80,14 @@ public class ControlBase {
     }
 
     private HashMap<Integer, Action> bindings;
+    private Joystick joy;
 
     /**
      * Constructor
      */
-    public ControlBase() {
+    public ControlBase(Joystick controller) {
         this.bindings = new HashMap<Integer, Action>();
+        this.joy = controller;
     }
 
     /**
@@ -104,5 +109,27 @@ public class ControlBase {
     public void bindMotorPower(int button, BaseMotorController motor, double enabled, double disabled) {
         Action act = new MotorAction(motor, ControlMode.PercentOutput, enabled, disabled);
         this.bind(button, act);
+    }
+
+    /**
+     * This should be called in the robot's initialization code.
+     */
+    public void robotInit() {
+        // Unused for now
+    }
+
+    /**
+     * This should be called in the robot's teleop loop, it updates all buttons/actions
+     */
+    public void teleopPeriodic() {
+        this.bindings.forEach((button, action) -> {
+            if (this.joy.getRawButton(button))
+                action.whileActivated();
+            else
+                action.whileDeactivated();
+            
+            if (this.joy.getRawButtonPressed(button))  action.onActivate();
+            if (this.joy.getRawButtonReleased(button)) action.onDeactivate();
+        });
     }
 }

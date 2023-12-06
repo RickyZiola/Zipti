@@ -4,7 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.redneckrobotics.zipti.ControlBase;
+
+/**
+ * This is an example usage of the Zipti control system.
+ */
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -13,13 +21,23 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
+  private ControlBase control;
+  private Joystick joystick;
+  private WPI_TalonFX motor;
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    this.joystick = new Joystick(0);
+    this.motor = new WPI_TalonFX(0);
+    this.control = new ControlBase(this.joystick);
+
+    control.bindMotorPower(0, this.motor, 1.0, 0.0);
+    control.robotInit();
+  }
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -54,7 +72,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    control.teleopPeriodic();
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
