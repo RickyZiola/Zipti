@@ -82,7 +82,8 @@ public class ControlBase {
         }
     }
 
-    private int xAx, yAx, tAx;
+    private int xAx, yAx, tAx, trimAx;
+    private double trimLow, trimHigh;
     private BaseDrive drv;
     private HashMap<Integer, Action> bindings;
     private Joystick joy;
@@ -97,6 +98,7 @@ public class ControlBase {
         this.xAx = 0;
         this.yAx = 0;
         this.tAx = 0;
+        this.trimAx = 0;
     }
 
     /**
@@ -120,12 +122,25 @@ public class ControlBase {
         this.bind(button, act);
     }
 
-    public void bindDrive(BaseDrive drv, int xAxis, int yAxis, int turnAxis) {
+    /**
+     * Bind a new drivetrain. This overwrites the existing drive.
+     * @param drv The drivetrain to use
+     * @param xAxis The X-channel of the controller
+     * @param yAxis The Y-channel of the controller
+     * @param turnAxis The twist/turn channel of the controller
+     * @param trimAxis The trim/throttle channel of the controller
+     */
+    public void bindDrive(BaseDrive drv, int xAxis, int yAxis, int turnAxis, int trimAxis) {
         this.xAx = xAxis;
         this.yAx = yAxis;
         this.tAx = turnAxis;
+        this.trimAx = trimAxis;
 
         this.drv = drv;
+    }
+    public void setTrimRange(double bot, double top) {
+        this.trimLow = bot;
+        this.trimHigh = top;
     }
 
     /**
@@ -149,10 +164,11 @@ public class ControlBase {
             if (this.joy.getRawButtonReleased(button)) action.onDeactivate();
         });
 
+        double trim = (this.joy.getRawAxis(this.trimAx) * 0.5 + 0.5) * (this.trimHigh - this.trimLow) + this.trimLow;
         double tX, tY, turn;
-        tX = this.joy.getRawAxis(this.xAx);
-        tY = this.joy.getRawAxis(this.yAx);
-        turn = this.joy.getRawAxis(this.tAx);
+        tX   = this.joy.getRawAxis(this.xAx) * trim;
+        tY   = this.joy.getRawAxis(this.yAx) * trim;
+        turn = this.joy.getRawAxis(this.tAx) * trim;
 
         if (this.drv != null) this.drv.set(new Vec2(tX, tY), turn);
     }

@@ -43,9 +43,9 @@ public class Robot extends TimedRobot {
     this.motor = new WPI_TalonFX(8);
 
     this.control = new ControlBase(this.joystick);
-    this.control.bindDrive(this.drive, 0, 1, 2);
+    this.control.bindDrive(this.drive, this.joystick.getXChannel(), this.joystick.getYChannel(), this.joystick.getTwistChannel(), this.joystick.getThrottleChannel());
     control.bindMotorPower(0, this.motor, 1.0, 0.0);
-    
+
     control.robotInit();
   }
 
