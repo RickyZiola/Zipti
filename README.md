@@ -3,6 +3,6 @@ Zipti (Zipti Integration for Programmable Technology/Input) is a Java library fo
 
 ```
 TODO:
-* everything
+* Tank/mechanum drive
 * docs
 ```

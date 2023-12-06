@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.redneckrobotics.zipti.ControlBase;
+import com.redneckrobotics.zipti.swerve.SwerveDrive;
 
 /**
  * This is an example usage of the Zipti control system.
@@ -24,6 +25,7 @@ public class Robot extends TimedRobot {
   private ControlBase control;
   private Joystick joystick;
   private WPI_TalonFX motor;
+  private SwerveDrive drive;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -32,10 +34,18 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     this.joystick = new Joystick(0);
-    this.motor = new WPI_TalonFX(0);
-    this.control = new ControlBase(this.joystick);
+    this.drive = new SwerveDrive(
+      new WPI_TalonFX(0), new WPI_TalonFX(1),
+      new WPI_TalonFX(2), new WPI_TalonFX(3),
+      new WPI_TalonFX(4), new WPI_TalonFX(5),
+      new WPI_TalonFX(6), new WPI_TalonFX(7)
+    );
+    this.motor = new WPI_TalonFX(8);
 
+    this.control = new ControlBase(this.joystick);
+    this.control.bindDrive(this.drive, 0, 1, 2);
     control.bindMotorPower(0, this.motor, 1.0, 0.0);
+    
     control.robotInit();
   }
 

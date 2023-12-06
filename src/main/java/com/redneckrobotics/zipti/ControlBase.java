@@ -1,11 +1,14 @@
 package com.redneckrobotics.zipti;
 
-import java.util.HashMap;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.Joystick;
+import java.util.HashMap;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.redneckrobotics.zipti.drive.BaseDrive;
+import com.redneckrobotics.math.Vec2;
+
 
 public class ControlBase {
     /**
@@ -79,6 +82,8 @@ public class ControlBase {
         }
     }
 
+    private int xAx, yAx, tAx;
+    private BaseDrive drv;
     private HashMap<Integer, Action> bindings;
     private Joystick joy;
 
@@ -88,6 +93,10 @@ public class ControlBase {
     public ControlBase(Joystick controller) {
         this.bindings = new HashMap<Integer, Action>();
         this.joy = controller;
+
+        this.xAx = 0;
+        this.yAx = 0;
+        this.tAx = 0;
     }
 
     /**
@@ -111,6 +120,14 @@ public class ControlBase {
         this.bind(button, act);
     }
 
+    public void bindDrive(BaseDrive drv, int xAxis, int yAxis, int turnAxis) {
+        this.xAx = xAxis;
+        this.yAx = yAxis;
+        this.tAx = turnAxis;
+
+        this.drv = drv;
+    }
+
     /**
      * This should be called in the robot's initialization code.
      */
@@ -131,5 +148,12 @@ public class ControlBase {
             if (this.joy.getRawButtonPressed(button))  action.onActivate();
             if (this.joy.getRawButtonReleased(button)) action.onDeactivate();
         });
+
+        double tX, tY, turn;
+        tX = this.joy.getRawAxis(this.xAx);
+        tY = this.joy.getRawAxis(this.yAx);
+        turn = this.joy.getRawAxis(this.tAx);
+
+        if (this.drv != null) this.drv.set(new Vec2(tX, tY), turn);
     }
 }
