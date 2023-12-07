@@ -87,6 +87,7 @@ public class ControlBase {
     private BaseDrive drv;
     private HashMap<Integer, Action> bindings;
     private Joystick joy;
+    private boolean useCenterRot = false;
 
     /**
      * Constructor
@@ -129,15 +130,23 @@ public class ControlBase {
      * @param yAxis The Y-channel of the controller
      * @param turnAxis The twist/turn channel of the controller
      * @param trimAxis The trim/throttle channel of the controller
+     * @param useCenterRot Wether or not to use the HAT/POV button to change the center of rotation of the drive. This should probably be false for tank, but with swerve and sometimes mechanum, it's a useful feature.
      */
-    public void bindDrive(BaseDrive drv, int xAxis, int yAxis, int turnAxis, int trimAxis) {
+    public void bindDrive(BaseDrive drv, int xAxis, int yAxis, int turnAxis, int trimAxis, boolean useCenterRot) {
         this.xAx = xAxis;
         this.yAx = yAxis;
         this.tAx = turnAxis;
         this.trimAx = trimAxis;
 
         this.drv = drv;
+        this.useCenterRot = useCenterRot;
     }
+    
+    /**
+     * Set the range of the drive speed trim
+     * @param bot The lower end of the trim range
+     * @param top The higher end of the trim range
+     */
     public void setTrimRange(double bot, double top) {
         this.trimLow = bot;
         this.trimHigh = top;
@@ -170,6 +179,18 @@ public class ControlBase {
         tY   = this.joy.getRawAxis(this.yAx) * trim;
         turn = this.joy.getRawAxis(this.tAx) * trim;
 
-        if (this.drv != null) this.drv.set(new Vec2(tX, tY), turn);
+        if (this.drv != null) {
+
+                // Change the center of rotation based on the HAT/POV switch (aka d-pad)
+            int cRotAng = this.joy.getPOV();
+            Vec2 normCenterRot = new Vec2(
+                Math.cos(Math.toRadians(cRotAng)),
+                Math.sin(Math.toRadians(cRotAng))
+            ).norm();
+
+            Vec2 trueCenterRot = normCenterRot.times(this.drv.halfSize);
+            if (this.useCenterRot) this.drv.centerRot = trueCenterRot;
+            this.drv.set(new Vec2(tX, tY), turn);
+        }
     }
 }
