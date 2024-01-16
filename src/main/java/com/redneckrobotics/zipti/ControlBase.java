@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.Joystick;
+
 import java.util.HashMap;
 
 import com.redneckrobotics.zipti.drive.BaseDrive;
@@ -173,23 +174,25 @@ public class ControlBase {
             if (this.joy.getRawButtonReleased(button)) action.onDeactivate();
         });
 
-        double trim = (this.joy.getRawAxis(this.trimAx) * 0.5 + 0.5) * (this.trimHigh - this.trimLow) + this.trimLow;
+        double trim = (this.joy.getRawAxis(this.trimAx) * -0.5 + 0.5) * (this.trimHigh - this.trimLow) + this.trimLow;
         double tX, tY, turn;
         tX   = this.joy.getRawAxis(this.xAx) * trim;
-        tY   = this.joy.getRawAxis(this.yAx) * trim;
+        tY   = -this.joy.getRawAxis(this.yAx) * trim;
         turn = this.joy.getRawAxis(this.tAx) * trim;
 
         if (this.drv != null) {
-
                 // Change the center of rotation based on the HAT/POV switch (aka d-pad)
             int cRotAng = this.joy.getPOV();
             Vec2 normCenterRot = new Vec2(
-                Math.cos(Math.toRadians(cRotAng)),
-                Math.sin(Math.toRadians(cRotAng))
-            ).norm();
-
+                Math.cos(Math.toRadians(cRotAng-90)),
+                Math.sin(Math.toRadians(cRotAng+90))
+            );
+            if (cRotAng == -1) {
+                normCenterRot = new Vec2(0.0);
+            }
             Vec2 trueCenterRot = normCenterRot.times(this.drv.halfSize);
             if (this.useCenterRot) this.drv.centerRot = trueCenterRot;
+            else this.drv.centerRot = new Vec2(0.0);
             this.drv.set(new Vec2(tX, tY), turn);
         }
     }

@@ -9,13 +9,14 @@ public class SwerveModule {
 
     private double _getOptimizedAngle(double angle) {
         // Convert to encoder units TODO: make the units/revolution changeable
-        double units = angle * 2048.0 / Math.PI;
+        double units = angle * (4096.0 * 6.4 / (2.0 * Math.PI));
 
         // Avoid annoying "lugnut issues"
         // named by our mechanic, not the programmers
         double delta = units - this.turn.getSelectedSensorPosition();
-        while (delta >  2048) delta -= 2048;
-        while (delta < -2048) delta += 2048;
+            // 12.0 is the turning gear ratio
+        while (delta >  2048.0 * 6.4) delta -= 4096.0 * 6.4;
+        while (delta < -2048.0 * 6.4) delta += 4096.0 * 6.4;
 
         // Final angle
         return this.turn.getSelectedSensorPosition() + delta;
@@ -33,6 +34,10 @@ public class SwerveModule {
     public SwerveModule(WPI_TalonFX drive, WPI_TalonFX turn) {
         this.drive = drive;
         this.turn  = turn;
+
+        this.turn.config_kP(0, 0.10000);
+        this.turn.config_kI(0, 0.00007);
+        this.turn.config_kD(0, 0.00020);
     }
 
     /**

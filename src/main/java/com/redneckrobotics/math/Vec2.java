@@ -1,81 +1,170 @@
-package com.redneckrobotics.math ;
+package com.redneckrobotics.math;
 
 /**
- * TODO: replace this with the actually good implementation from the SteelSwerve prototype
+ * 2-dimensional vector class
  */
-
 public class Vec2 {
-    public double x, y;
+    /**
+     * Components of the vector
+     */
+    public double x,y;
 
+    /**
+     * Construct a new Vec2 with (0,0)
+     */
+    public Vec2() {
+        this.x = 0;
+        this.y = 0;
+    }
+
+    /**
+     * Construct a new Vec2 with (x,x)
+     * @param x The value to set the Vec2's x and y component to
+     */
+    public Vec2(double x) {
+        this.x = x;
+        this.y = x;
+    }
+
+    /**
+     * Construct a new Vec2 with (x,y)
+     * @param x The value to set the Vec2's x component to
+     * @param y The value to set the Vec2's y component to
+     */
     public Vec2(double x, double y) {
         this.x = x;
         this.y = y;
     }
-    public Vec2(double x) {
-        this(x,x);
-    }
-    public Vec2() {
-        this(0,0);
-    }
 
-    // Static mathematics
-    public static Vec2 add(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x + vec2.x, vec1.y + vec2.y);
+    /**
+     * Add 2 vectors
+     * @param x The left operand
+     * @param y The right operand
+     * @return The element-wise sum of the operands
+     */
+    public static Vec2 add(Vec2 x, Vec2 y) {
+        return new Vec2(x.x + y.x, x.y + y.y);
     }
-    public static Vec2 sub(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x - vec2.x, vec1.y - vec2.y);
-    }
-    public static Vec2 mul(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x * vec2.x, vec1.y * vec2.y);
-    }
-    public static Vec2 div(Vec2 vec1, Vec2 vec2) {
-        return new Vec2(vec1.x / vec2.x, vec1.y / vec2.y);
-    }
-
-    // Instancs maths
+    /**
+     * Add 2 vectors
+     * @param other The right operand
+     * @return The element-wise sum of this and other
+     */
     public Vec2 plus(Vec2 other) {
         return new Vec2(this.x + other.x, this.y + other.y);
     }
+
+    /**
+     * Subtract 2 vectors
+     * @param x The left operand
+     * @param y The right operand
+     * @return The element-wise difference of the operands
+     */
+    public static Vec2 subtract(Vec2 x, Vec2 y) {
+        return new Vec2(x.x - y.x, x.y - y.y);
+    }
+
+    /**
+     * Subtract 2 vectors
+     * @param other The right operand
+     * @return The elemen-wise difference of this and other
+     */
     public Vec2 minus(Vec2 other) {
         return new Vec2(this.x - other.x, this.y - other.y);
     }
+
+    /**
+     * Multiply two vectors
+     * @param x The left operand
+     * @param y The right operand
+     * @return The element-wise multiplication of the operands
+     */
+    public static Vec2 multiply(Vec2 x, Vec2 y) {
+        return new Vec2(x.x * y.x, x.y * y.y);
+    }
+
+    /**
+     * Multiply two vectors
+     * @param other The right operand
+     * @return The element-wise multiplication of this and other
+     */
     public Vec2 times(Vec2 other) {
         return new Vec2(this.x * other.x, this.y * other.y);
     }
-    public Vec2 divided(Vec2 other) {
-        return new Vec2(this.x / other.x, this.y / other.y);
-    }
-    public Vec2 plus(double other) {
-        return new Vec2(this.x + other, this.y + other);
-    }
-    public Vec2 minus(double other) {
-        return new Vec2(this.x - other, this.y - other);
-    }
+
     public Vec2 times(double other) {
         return new Vec2(this.x * other, this.y * other);
     }
-    public Vec2 divided(double other) {
-        return new Vec2(this.x / other, this.y / other);
+
+    /**
+     * Divide two vectors
+     * @param x The left operand
+     * @param y The right operand
+     * @return The element-wise division of the operands
+     */
+    public static Vec2 divide(Vec2 x, Vec2 y) {
+        return new Vec2(x.x / y.x, x.y / y.y);
     }
 
+    /**
+     * Divide two vectors
+     * @param other The right operand
+     * @return The element-wise division of this and other
+     */
+    public Vec2 divided(Vec2 other) {
+        return new Vec2(this.x / other.x, this.y / other.y);
+    }
+
+    /**
+     * Dot product of two vectors
+     * @param x The left operand
+     * @param y The right operand
+     * @return The dot product of x and y
+     */
+    public static double dot(Vec2 x, Vec2 y) {
+        return x.x * y.x + x.y * y.y;
+    }
+
+    /**
+     * Length of a vector
+     * @param x The vector to length
+     * @return The length of x
+     */
+    public static double length(Vec2 x) {
+        return Math.sqrt(x.x*x.x + x.y*x.y);
+    }
+
+    /**
+     * Length of this
+     * @return The length of this
+     */
     public double length() {
-        return Math.sqrt(this.x*this.x + this.y*this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-    public Vec2 norm() {
-        double len = this.length();
-        if(len == 0)
-            len = 1;
-        return this.divided(new Vec2(len, len));
+    /**
+     * Normalize a vector
+     * @param x The vector to normalize
+     * @return The normalized vector
+     */
+    public static Vec2 normalize(Vec2 x) {
+        return x.divided(new Vec2(x.length()));
     }
 
-    public static Vec2 rotate(Vec2 v, double radians) {
-        return new Vec2(
-            Math.cos(radians)*v.x + Math.sin(radians)*v.y,
-            Math.cos(radians)*v.y - Math.sin(radians)*v.x );
-    }
-    public Vec2 rotate(double radians) {
-        return rotate(this, radians);
+    /**
+     * Normalize a vector
+     * @return this, normalized
+     */
+    public Vec2 normalized() {
+        return this.divided(new Vec2(this.length()));
     }
 
+    /**
+     * Rotate a vector around the origin.
+     * @param angleRadians The angle to rotate by
+     * @return
+     */
+    public Vec2 rotate(double angleRadians) {
+        return new Vec2(this.x * Math.cos(angleRadians) - this.y * Math.sin(angleRadians), this.y * Math.cos(angleRadians) + this.x * Math.sin(angleRadians));
+    }
 }

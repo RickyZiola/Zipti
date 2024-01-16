@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.redneckrobotics.pyFRC.Server;
 import com.redneckrobotics.zipti.ControlBase;
 import com.redneckrobotics.zipti.swerve.SwerveDrive;
 
@@ -24,8 +25,9 @@ import com.redneckrobotics.zipti.swerve.SwerveDrive;
 public class Robot extends TimedRobot {
   private ControlBase control;
   private Joystick joystick;
-  private WPI_TalonFX motor;
   private SwerveDrive drive;
+
+  Server serv;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -35,12 +37,11 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     this.joystick = new Joystick(0);
     this.drive = new SwerveDrive(
-      new WPI_TalonFX(0), new WPI_TalonFX(1),
-      new WPI_TalonFX(2), new WPI_TalonFX(3),
-      new WPI_TalonFX(4), new WPI_TalonFX(5),
-      new WPI_TalonFX(6), new WPI_TalonFX(7)
+      new WPI_TalonFX(1), new WPI_TalonFX(0),
+      new WPI_TalonFX(3), new WPI_TalonFX(2),
+      new WPI_TalonFX(5), new WPI_TalonFX(4),
+      new WPI_TalonFX(7), new WPI_TalonFX(6)
     );
-    this.motor = new WPI_TalonFX(8);
 
     this.control = new ControlBase(this.joystick);
     this.control.bindDrive(this.drive,     // Drivebase
@@ -49,13 +50,18 @@ public class Robot extends TimedRobot {
       this.joystick.getTwistChannel(),     // Turn
       this.joystick.getThrottleChannel(),  // Trim
       true); // Use HAT switch for center of rotation
-    control.bindMotorPower(0, this.motor, 1.0, 0.0);
+    this.control.setTrimRange(0.5, 1.0);
 
     control.robotInit();
+    this.serv = new Server((short)6969);
+    this.serv.setup();
+
   }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    this.serv.update();
+  }
 
   @Override
   public void autonomousInit() {}
